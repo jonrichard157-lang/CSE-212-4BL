@@ -12,8 +12,13 @@ public static class Arrays
         // Remember: Using comments in your program, write down your process for solving this problem
         // step by step before you write the code. The plan should be clear enough that it could
         // be implemented by another person.
+        double[] result = new double[length]; // Create an array of doubles with the specified length
+        for (int i = 0; i < length; i++) // Loop through each index of the array
+        {
+            result[i] = number * (i + 1); // Calculate the multiple and assign it to the current index
+        }
 
-        return []; // replace this return statement with your own
+        return result; // replace this return statement with your own
     }
 
     /// <summary>
@@ -29,5 +34,16 @@ public static class Arrays
         // Remember: Using comments in your program, write down your process for solving this problem
         // step by step before you write the code. The plan should be clear enough that it could
         // be implemented by another person.
+        List<int> copy = new List<int>(data); // Create a copy of the original list to avoid modifying it during rotation
+        data.Clear(); // Clear the original list to prepare for the rotated values
+
+        for(int i = copy.Count - amount; i < copy.Count; i++) // Loop through the last 'amount' elements of the copy
+        {
+            data.Add(copy[i]); // Add the last 'amount' elements to the original list first
+        }
+        for(int i = 0; i < copy.Count - amount; i++) // Loop through the first part of the copy
+        {
+            data.Add(copy[i]); // Add the remaining elements to the original list
+        }
     }
 }
