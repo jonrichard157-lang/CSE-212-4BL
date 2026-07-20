@@ -22,7 +22,22 @@ public static class SetsAndMaps
     public static string[] FindPairs(string[] words)
     {
         // TODO Problem 1 - ADD YOUR CODE HERE
-        return [];
+        var wordset = new HashSet<string>();
+        var pairs = new List<string>();
+        foreach (var word in words)
+        {
+            var reversed = new string(word.Reverse().ToArray());
+            if (wordset.Contains(reversed) && word != reversed)
+            {
+                pairs.Add($"{word} & {reversed}");
+            }
+            else
+            {
+                wordset.Add(word);
+            }
+        }
+
+        return pairs.ToArray();
     }
 
     /// <summary>
@@ -43,6 +58,15 @@ public static class SetsAndMaps
         {
             var fields = line.Split(",");
             // TODO Problem 2 - ADD YOUR CODE HERE
+            var degree = fields[3];
+            if (degrees.ContainsKey(degree))
+            {
+                degrees[degree]++;
+            }
+            else
+            {
+                degrees[degree] = 1;
+            }
         }
 
         return degrees;
@@ -64,11 +88,62 @@ public static class SetsAndMaps
     /// Reminder: You can access a letter by index in a string by 
     /// using the [] notation.
     /// </summary>
+
+
+
     public static bool IsAnagram(string word1, string word2)
+    // TODO Problem 3 - ADD YOUR CODE HERE
     {
-        // TODO Problem 3 - ADD YOUR CODE HERE
-        return false;
+        // Remove spaces and convert both words to lowercase
+        word1 = word1.Replace(" ", "").ToLower();
+        word2 = word2.Replace(" ", "").ToLower();
+
+        // If the lengths are different after removing spaces,
+        // the words cannot be anagrams
+        if (word1.Length != word2.Length)
+        {
+            return false;
+        }
+
+        // Create a dictionary to store the frequency of each letter
+        var charCounts = new Dictionary<char, int>();
+
+        // Count the letters in the first word
+        foreach (char c in word1)
+        {
+            if (charCounts.ContainsKey(c))
+            {
+                charCounts[c]++;
+            }
+            else
+            {
+                charCounts[c] = 1;
+            }
+        }
+
+        // Decrease the count for each letter in the second word
+        foreach (char c in word2)
+        {
+            // If the letter is not found, the words are not anagrams
+            if (!charCounts.ContainsKey(c))
+            {
+                return false;
+            }
+
+            charCounts[c]--;
+
+            // If the count becomes negative, the second word
+            // contains this letter more times than the first
+            if (charCounts[c] < 0)
+            {
+                return false;
+            }
+        }
+
+        // If no mismatches were found, the words are anagrams
+        return true;
     }
+
 
     /// <summary>
     /// This function will read JSON (Javascript Object Notation) data from the 
@@ -86,21 +161,55 @@ public static class SetsAndMaps
     /// </summary>
     public static string[] EarthquakeDailySummary()
     {
-        const string uri = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
+        const string uri =
+            "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
+
         using var client = new HttpClient();
-        using var getRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
-        using var jsonStream = client.Send(getRequestMessage).Content.ReadAsStream();
+        using var getRequestMessage =
+            new HttpRequestMessage(HttpMethod.Get, uri);
+
+        using var jsonStream = client
+            .Send(getRequestMessage)
+            .Content
+            .ReadAsStream();
+
         using var reader = new StreamReader(jsonStream);
+
         var json = reader.ReadToEnd();
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-        var featureCollection = JsonSerializer.Deserialize<FeatureCollection>(json, options);
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
 
-        // TODO Problem 5:
-        // 1. Add code in FeatureCollection.cs to describe the JSON using classes and properties 
-        // on those classes so that the call to Deserialize above works properly.
-        // 2. Add code below to create a string out each place a earthquake has happened today and its magitude.
-        // 3. Return an array of these string descriptions.
-        return [];
+        // Deserialize the JSON into C# objects
+        var featureCollection =
+            JsonSerializer.Deserialize<FeatureCollection>(json, options);
+
+        // Return an empty array if no earthquake data was found
+        if (featureCollection?.Features == null)
+        {
+            return Array.Empty<string>();
+        }
+
+        // Store the formatted earthquake descriptions
+        var summaries = new List<string>();
+
+        // Process each earthquake
+        foreach (var feature in featureCollection.Features)
+        {
+            if (feature?.Properties == null)
+            {
+                continue;
+            }
+
+            var place = feature.Properties.Place ?? "Unknown location";
+            var magnitude = feature.Properties.Mag;
+
+            // Required format: "Location - Mag magnitude"
+            summaries.Add($"{place} - Mag {magnitude}");
+        }
+
+        return summaries.ToArray();
     }
 }
