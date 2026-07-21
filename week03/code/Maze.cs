@@ -71,7 +71,7 @@ public class Maze
         {
             throw new InvalidOperationException("Can't go that way!");
         }        
-        _currY++;
+        _currY--;
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ public class Maze
         {
             throw new InvalidOperationException("Can't go that way!");
         }
-        _currY--;
+        _currY++;
     }
 
     public string GetStatus()

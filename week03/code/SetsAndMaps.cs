@@ -31,10 +31,10 @@ public static class SetsAndMaps
             {
                 pairs.Add($"{word} & {reversed}");
             }
-            else
-            {
-                wordset.Add(word);
-            }
+            
+            
+            wordset.Add(word);
+            
         }
 
         return pairs.ToArray();
